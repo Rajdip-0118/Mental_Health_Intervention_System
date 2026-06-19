@@ -3,6 +3,7 @@
 A privacy-focused web-based Mental Health Digital Intervention System developed using **Django**.  
 The system provides mental health awareness, self-assessment, encrypted journaling, and AI-assisted supportive guidance in a **non-diagnostic and ethical manner**.
 
+# Key generation and Tailwind CSS set up guide
 **z_dev set up**
 
 cd z_dev
