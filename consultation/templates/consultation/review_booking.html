@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Review Booking{% endblock %}
+
+{% block content %}
+  <div class="fixed top-0 right-[-10%] w-[40rem] h-[40rem] bg-[radial-gradient(circle,rgba(225,29,72,0.12)_0%,transparent_70%)] pointer-events-none z-[-1]"></div>
+  <div class="fixed bottom-0 left-[-10%] w-[40rem] h-[40rem] bg-[radial-gradient(circle,rgba(236,72,153,0.12)_0%,transparent_70%)] pointer-events-none z-[-1]"></div>
+
+  <div class="max-w-3xl w-full mx-auto relative z-10">
+    
+    <div class="mb-8">
+      <button onclick="history.back()" class="inline-flex items-center px-6 py-3.5 rounded-2xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md shadow-sm hover:shadow-lg border border-slate-200/50 dark:border-slate-700/50 font-bold text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 transition-all hover:-translate-y-0.5">
+        ← Back to Slots
+      </button>
+    </div>
+
+    <div class="bg-white/60 dark:bg-[#151828]/60 backdrop-blur-xl border border-white/80 dark:border-slate-700/50 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-rose-500/10 dark:bg-pink-500/10 rounded-full blur-[60px] pointer-events-none"></div>
+      
+      <div class="text-center mb-10 relative z-10">
+        <div class="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner border border-rose-200 dark:border-rose-800/50 transform -rotate-6">
+          📋
+        </div>
+        <h1 class="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight mb-3">Review Your Session</h1>
+        <p class="text-slate-500 dark:text-slate-400 font-medium text-lg">Please confirm the details below before booking.</p>
+      </div>
+
+      <div class="bg-white/50 dark:bg-slate-900/50 rounded-[2rem] p-6 md:p-8 border border-slate-200/50 dark:border-slate-700/50 shadow-sm relative z-10 mb-8">
+        
+        <div class="flex items-center gap-5 mb-8 pb-8 border-b border-slate-200 dark:border-slate-700/50">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-md border border-white/20 relative overflow-hidden shrink-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-rose-600 to-pink-500 opacity-20 dark:opacity-100"></div>
+            <div class="relative z-10">👨‍⚕️</div>
+          </div>
+          <div>
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white mb-1" id="counselorName">Loading...</h2>
+            <p class="text-slate-500 dark:text-slate-400 font-bold" id="counselorSpecialty">--</p>
+          </div>
+        </div>
+
+        <div class="mb-6 space-y-4">
+          <div class="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-700/50">
+            <span class="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest">Date</span>
+            <span class="font-black text-slate-800 dark:text-white whitespace-nowrap" id="slotDate">Loading...</span>
+          </div>
+          <div class="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-700/50">
+            <span class="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest">Time</span>
+            <span class="font-black text-slate-800 dark:text-white whitespace-nowrap" id="slotTime">Loading...</span>
+          </div>
+          <div class="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-700/50">
+            <span class="text-slate-500 dark:text-slate-400 font-bold text-xs uppercase tracking-widest">Mode</span>
+            <span class="font-black text-slate-800 dark:text-white uppercase px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs" id="slotMode">Loading...</span>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <div class="flex justify-between items-center text-slate-500 dark:text-slate-400 font-medium">
+            <span>Consultation Fee</span>
+            <span class="font-bold text-slate-700 dark:text-slate-300" id="consultationFee">--</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-500 dark:text-slate-400 font-medium">
+            <span>Platform Fee</span>
+            <span class="font-bold text-slate-700 dark:text-slate-300">₹50.00</span>
+          </div>
+          
+          <div class="flex justify-between items-center mt-6 pt-6 border-t-2 border-dashed border-slate-200 dark:border-slate-700">
+            <span class="text-slate-800 dark:text-white font-black text-lg">Total Amount</span>
+            <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-500" id="totalFee">--</span>
+          </div>
+        </div>
+
+      </div>
+
+      <button onclick="openConfirmModal()" class="w-full bg-gradient-to-r from-rose-600 to-pink-500 hover:from-rose-700 hover:to-pink-600 text-white font-black text-xl py-5 rounded-2xl shadow-[0_10px_40px_-10px_rgba(225,29,72,0.5)] transition-all hover:-translate-y-1 active:scale-[0.98] relative z-10">
+        Confirm Booking
+      </button>
+
+    </div>
+  </div>
+
+  <div id="confirmModal" class="fixed inset-0 hidden items-center justify-center bg-slate-900/40 dark:bg-black/60 backdrop-blur-md z-50 transition-all">
+    <div class="bg-white/90 dark:bg-[#151828]/90 backdrop-blur-xl border border-white/80 dark:border-slate-700/50 rounded-[2.5rem] p-8 max-w-md w-full mx-4 shadow-2xl relative overflow-hidden text-center">
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-rose-500/20 dark:bg-pink-500/20 rounded-full blur-[40px] pointer-events-none z-[-1]"></div>
+      
+      <div class="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl border border-rose-200 dark:border-rose-800/50">
+        ✨
+      </div>
+      
+      <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Final Step</h2>
+      <p class="mt-4 text-slate-500 dark:text-slate-400 font-medium text-lg leading-relaxed">You are about to securely lock in this appointment. Proceed?</p>
+      
+      <div class="flex gap-4 mt-8">
+        <button onclick="closeModal()" class="flex-1 py-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancel</button>
+        <button onclick="confirmBooking()" class="flex-1 py-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-lg shadow-rose-500/20 transition-all hover:-translate-y-0.5">Yes, Book Now</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="messagePopup" class="hidden"><span id="popupText"></span></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+if(!localStorage.getItem("access")) location.href = "/api/core/login-page/";
+
+const params = new URLSearchParams(window.location.search);
+const counselorId = params.get("counselor");
+const slotId = params.get("slot");
+
+if(!counselorId || !slotId) location.href = "/api/consultation/";
+
+// ROBUST DATE FORMATTER
+function formatIndianDate(dateStr) {
+  if (!dateStr) return "--";
+  if (dateStr.includes("-")) {
+    const parts = dateStr.split("-");
+    if (parts[0].length === 4) { 
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+  }
+  return dateStr;
+}
+
+// ROBUST TIME FORMATTER
+function formatAMPM(timeStr) {
+  if (!timeStr) return "--";
+  try {
+    if (timeStr.toLowerCase().includes("am") || timeStr.toLowerCase().includes("pm")) return timeStr;
+    const parts = timeStr.split(':');
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; 
+    return hours.toString().padStart(2, '0') + ':' + minutes + ' ' + ampm;
+  } catch (e) {
+    return timeStr;
+  }
+}
+
+async function loadBooking(){
+  try {
+    const {res: cRes, data: cData} = await apiRequest(`/api/consultation/counselors/${counselorId}/`);
+    if(!cRes.ok) throw new Error();
+
+    const slot = cData.slots.find(s => s.id == slotId);
+    if(!slot) throw new Error();
+
+    document.getElementById("counselorName").innerText = cData.name;
+    document.getElementById("counselorSpecialty").innerText = cData.specialization;
+    
+    document.getElementById("slotDate").innerText = formatIndianDate(slot.date);
+    document.getElementById("slotTime").innerText = formatAMPM(slot.time);
+    
+    document.getElementById("slotMode").innerText = slot.mode;
+    document.getElementById("consultationFee").innerText = `₹${cData.consultation_fee}`;
+    document.getElementById("totalFee").innerText = `₹${parseFloat(cData.consultation_fee) + 50}`;
+
+  } catch {
+    showPopup("Failed loading booking", "error");
+  }
+}
+
+function openConfirmModal(){
+  document.getElementById("confirmModal").classList.remove("hidden");
+  document.getElementById("confirmModal").classList.add("flex");
+}
+
+function closeModal(){
+  document.getElementById("confirmModal").classList.remove("flex");
+  document.getElementById("confirmModal").classList.add("hidden");
+}
+
+async function confirmBooking(){
+  const {res,data} = await apiRequest(
+    "/api/consultation/book/",
+    "POST",
+    { counselor: counselorId, slot: slotId }
+  );
+
+  closeModal();
+
+  if(res.ok){
+    showPopup("Booking Confirmed 🎉");
+    setTimeout(()=>{
+      location.href = "/api/consultation/booking-history/";
+    }, 1200);
+  } else {
+    showPopup(data.error || "Booking failed", "error");
+  }
+}
+
+function showPopup(text, type="success"){
+  const popup = document.getElementById("messagePopup");
+  popup.className = `fixed top-8 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl text-white font-bold shadow-2xl z-[999] transition-all transform border border-white/20 backdrop-blur-md ${type === "error" ? "bg-red-500/90" : "bg-rose-600/90"}`;
+  document.getElementById("popupText").innerText = text;
+  popup.classList.remove("hidden");
+  setTimeout(()=> popup.classList.add("hidden"), 1800);
+}
+
+loadBooking();
+</script>
+{% endblock %}

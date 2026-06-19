@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Consultation Booking{% endblock %}
+
+{% block content %} 
+<style>
+  .slot-card { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; }
+  .slot-card:hover { transform: translateY(-4px); }
+  .slot-card.selected { 
+    transform: scale(1.02); 
+    border-color: #e11d48; 
+    box-shadow: 0 15px 40px rgba(225, 29, 72, 0.15); 
+    background: rgba(255, 255, 255, 0.9);
+  }
+  .dark .slot-card.selected {
+    background: #151828;
+    box-shadow: 0 15px 40px rgba(225, 29, 72, 0.3);
+  }
+</style>
+
+<div class="fixed top-0 right-[-10%] w-[40rem] h-[40rem] bg-[radial-gradient(circle,rgba(225,29,72,0.12)_0%,transparent_70%)] pointer-events-none z-[-1]"></div>
+<div class="fixed bottom-0 left-[-10%] w-[40rem] h-[40rem] bg-[radial-gradient(circle,rgba(236,72,153,0.12)_0%,transparent_70%)] pointer-events-none z-[-1]"></div>
+
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 relative z-10">
+  <div class="mb-8">
+    <a href="/api/consultation/" class="inline-flex items-center px-6 py-4 rounded-2xl bg-white dark:bg-slate-800 shadow-sm hover:shadow-lg border border-slate-200/50 dark:border-slate-700/50 font-bold text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 transition-all hover:-translate-y-0.5 text-base">
+      ← Back to Consultation
+    </a>
+  </div>
+
+  <div class="grid lg:grid-cols-[340px_1fr] gap-8">
+    <div class="bg-white dark:bg-[#151828] rounded-[2.5rem] p-8 border border-slate-200/60 dark:border-slate-800 shadow-xl lg:sticky lg:top-8 h-fit flex flex-col items-center text-center">
+      <div class="w-32 h-32 rounded-[2rem] flex items-center justify-center text-6xl mb-6 shadow-md border border-white/20 relative overflow-hidden group/avatar">
+        <div class="absolute inset-0 bg-gradient-to-br from-rose-600 to-pink-500 opacity-20 dark:opacity-100"></div>
+        <div class="relative z-10">👨‍⚕️</div>
+      </div>
+      <h1 id="counselorName" class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Loading...</h1>
+      <div id="designation" class="w-full mt-2"></div>
+
+      <div class="grid grid-cols-2 gap-4 w-full mt-8">
+        <div class="bg-slate-50 dark:bg-[#1a1d2e] p-4 rounded-2xl border border-slate-100 dark:border-slate-800/50 shadow-inner">
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Experience</p>
+          <h2 id="experience" class="font-black text-xl text-slate-800 dark:text-white mt-1"></h2>
+        </div>
+        <div class="bg-slate-50 dark:bg-[#1a1d2e] p-4 rounded-2xl border border-slate-100 dark:border-slate-800/50 shadow-inner">
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Session</p>
+          <h2 class="font-black text-xl text-slate-800 dark:text-white mt-1">45 min</h2>
+        </div>
+      </div>
+
+      <div class="w-full mt-6 bg-rose-50/50 dark:bg-[#1a1d2e] border border-rose-100 dark:border-rose-900/30 rounded-3xl p-6 shadow-inner">
+        <p class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Consultation Fee</p>
+        <h2 id="counselorFee" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-500 mt-2"></h2>
+      </div>
+    </div>
+
+    <div class="space-y-8">
+      <div class="bg-white dark:bg-[#151828] border border-slate-200/60 dark:border-slate-800 rounded-[2.5rem] p-8 md:p-10 shadow-xl">
+        <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Choose Available Slot</h2>
+        
+        <div class="grid md:grid-cols-3 gap-4 mt-8">
+          <input id="manualDate" type="date" class="w-full h-14 px-5 rounded-2xl bg-slate-50 dark:bg-[#1a1d2e] border-none text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-inner transition-all text-base font-medium dark:[color-scheme:dark]">
+          <select id="modeFilter" class="w-full h-14 px-5 rounded-2xl bg-slate-50 dark:bg-[#1a1d2e] border-none text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-inner transition-all text-base font-medium appearance-none">
+            <option value="">All Modes</option>
+            <option value="online">💻 Online</option>
+            <option value="offline">🏥 Offline</option>
+          </select>
+          <input id="manualTime" type="time" class="w-full h-14 px-5 rounded-2xl bg-slate-50 dark:bg-[#1a1d2e] border-none text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500 shadow-inner transition-all text-base font-medium dark:[color-scheme:dark]">
+        </div>
+
+        <div class="flex items-center justify-between mt-10 mb-6 border-b border-slate-200/50 dark:border-slate-800/50 pb-4">
+          <h2 class="text-2xl font-black text-slate-800 dark:text-white">Available Slots</h2>
+          <span id="slotCounter" class="px-5 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-bold text-sm border border-rose-100 dark:border-rose-800/30 shadow-sm">0 Slots</span>
+        </div>
+
+        <div id="slotContainer" class="grid md:grid-cols-2 gap-5 mt-6"></div>
+      </div>
+
+      <div class="bg-white dark:bg-[#151828] border border-slate-200/60 dark:border-slate-800 rounded-[2.5rem] p-8 md:p-10 shadow-xl">
+        <h2 class="text-2xl font-black text-slate-800 dark:text-white">Booking Summary</h2>
+        <div class="flex justify-between mt-8 text-slate-600 dark:text-slate-300 font-medium text-lg">
+          <span>Consultation Fee</span>
+          <b id="summaryFee" class="text-slate-800 dark:text-white"></b>
+        </div>
+        <div class="flex justify-between mt-4 text-slate-600 dark:text-slate-300 font-medium text-lg">
+          <span>Platform Fee</span>
+          <b class="text-slate-800 dark:text-white">₹50</b>
+        </div>
+        <hr class="my-6 border-slate-200/60 dark:border-slate-800/60">
+        <div class="flex items-center justify-between">
+          <span class="font-black text-2xl text-slate-800 dark:text-white">Total</span>
+          <span id="totalFee" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-500"></span>
+        </div>
+
+        <button onclick="goBooking()" class="w-full relative overflow-hidden mt-10 py-5 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-500 text-white font-black text-lg shadow-[0_8px_20px_-6px_rgba(225,29,72,0.4)] transition-all hover:shadow-[0_12px_25px_-6px_rgba(225,29,72,0.6)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 group/btn border border-rose-400/30">
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]"></div>
+          <span class="relative z-10 tracking-wide uppercase">Continue Booking</span>
+          <svg class="w-6 h-6 relative z-10 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="messagePopup" class="hidden"><span id="popupText"></span></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+if (!localStorage.getItem("access")) location.href = "/api/core/login-page/";
+
+let selectedSlot = null, counselor = {}, slotData = [];
+const params = new URLSearchParams(window.location.search);
+const counselorId = params.get("counselor");
+const dateInput = document.getElementById("manualDate");
+const timeInput = document.getElementById("manualTime");
+const modeFilter = document.getElementById("modeFilter");
+
+const today = new Date();
+const maxDate = new Date();
+maxDate.setDate(today.getDate() + 60);
+function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+dateInput.min = formatLocalDate(today);
+dateInput.max = formatLocalDate(maxDate);
+dateInput.value = formatLocalDate(today);
+
+function formatDateDDMMYYYY(dateStr) {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    return `${day}-${month}-${year}`;
+}
+
+function formatTimeAMPM(timeStr) {
+    if (!timeStr) return '';
+    let [hours, minutes] = timeStr.split(':');
+    hours = parseInt(hours, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; 
+    return `${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+}
+
+async function loadBooking() {
+  try {
+    const result = await apiRequest(`/api/consultation/counselors/${counselorId}/`);
+    const data = result?.data;
+    if (!data) throw new Error("No API data returned");
+
+    counselor = data || {};
+    slotData = Array.isArray(data.slots) ? data.slots : [];
+
+    document.getElementById("counselorName").innerText = counselor.name || "Unknown";
+    document.getElementById("designation").innerHTML = `
+      <p class="text-sm font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mt-1">${counselor.designation || ""}</p>
+      <div class="flex flex-wrap items-center justify-center gap-3 mt-4">
+          <div class="flex items-center gap-1.5 bg-amber-50/80 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 px-3 py-1.5 rounded-xl shadow-sm">
+              <span class="text-xs font-black text-amber-500 dark:text-amber-400">⭐ ${counselor.rating || '0.0'}</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-blue-50/80 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 px-3 py-1.5 rounded-xl shadow-sm">
+              <span class="text-xs font-black text-blue-600 dark:text-blue-400">👥 ${counselor.total_sessions || '0'} Sessions</span>
+          </div>
+      </div>
+      <div class="mt-5 text-base text-slate-500 dark:text-slate-400 font-medium">${counselor.specialization || ""}</div>
+      ${counselor.email ? `<div class="mt-4 text-sm font-bold text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 lowercase"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>${counselor.email}</div>` : ''}
+      <div class="flex gap-3 mt-6 justify-center flex-wrap">
+        <span class="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm border border-emerald-200 dark:border-emerald-800/50">✓ Verified</span>
+        <span class="bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm border border-rose-200 dark:border-rose-800/50">${counselor.mode==="online"?"💻":"🏥"} ${counselor.mode || ""}</span>
+      </div>
+      ${counselor.office_address ? `<div class="mt-6 p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800/50"><div class="text-xs uppercase font-bold tracking-widest text-cyan-600">📍 Doctor Office</div><div class="mt-2 text-sm font-medium">${counselor.office_address}</div></div>` : ""}
+    `;
+
+    document.getElementById("experience").innerText = `${counselor.experience || 0}+ Yrs`;
+    document.getElementById("counselorFee").innerText = `₹${counselor.consultation_fee || 0}`;
+    document.getElementById("summaryFee").innerText = `₹${counselor.consultation_fee || 0}`;
+    document.getElementById("totalFee").innerText = `₹${parseFloat(counselor.consultation_fee || 0) + 50}`;
+    renderSlots();
+  } catch (err) {
+    showPopup(err?.message || "Failed loading data", "error");
+  }
+}
+
+function renderSlots() {
+  let slots = [...slotData];
+  
+  if (dateInput.value) slots = slots.filter(s => s.date === dateInput.value);
+  if (modeFilter.value) slots = slots.filter(s => s.mode === modeFilter.value);
+  
+  if (timeInput.value) {
+    slots = slots.filter(s => s.time.substring(0, 5) === timeInput.value);
+  }
+  if (typeof bookingId !== 'undefined') {
+      slots = slots.filter(s => !s.booked);
+  }
+
+  document.getElementById("slotCounter").innerText = `${slots.length} Slots`;
+  
+  document.getElementById("slotContainer").innerHTML = !slots.length
+    ? `<div class="col-span-full p-10 rounded-[2rem] text-center bg-slate-50 dark:bg-[#1a1d2e] border border-slate-200/60 dark:border-slate-800/50 shadow-inner"><div class="text-6xl mb-4 opacity-50 grayscale">😔</div>
+    <h2 class="font-black text-2xl text-slate-800 dark:text-white">No Slots Found</h2><p class="text-slate-500 mt-2 text-base font-medium">Try adjusting your filters.</p></div>`
+    : slots.map(s => `
+        <div onclick="selectSlot(this,'${s.id}')" class="slot-card bg-slate-50 dark:bg-[#1a1d2e] rounded-[2rem] p-6 cursor-pointer shadow-inner border border-slate-200/50 dark:border-slate-800/50 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="relative z-10 flex flex-wrap justify-between items-start gap-2">
+            <div>
+              <h2 class="font-black text-2xl text-slate-800 dark:text-white flex items-center gap-2">🕒 ${formatTimeAMPM(s.time.substring(0, 5))}</h2>
+              <p class="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">45 min session</p>
+            </div>
+            <span class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-sm border ${s.mode==='online'?'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50':'bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-400 dark:border-cyan-800/50'}">
+              ${s.mode==='online'?'💻':'🏥'} ${s.mode}
+            </span>
+          </div>
+          <div class="relative z-10 mt-6 bg-white dark:bg-[#151828] border border-slate-200/50 dark:border-slate-800/50 rounded-xl p-4 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center gap-2 shadow-sm text-base">📅 ${formatDateDDMMYYYY(s.date)}</div>
+        </div>
+      `).join("");
+}
+
+function selectSlot(card, id) {
+  document.querySelectorAll(".slot-card").forEach(e => e.classList.remove("selected"));
+  card.classList.add("selected");
+  selectedSlot = id;
+}
+
+function goBooking() {
+  if (!selectedSlot) return showPopup("Select a slot", "error");
+  location.href = `/api/consultation/review-booking/?counselor=${counselorId}&slot=${selectedSlot}`;
+}
+
+function showPopup(text, type = "success") {
+  const p = document.getElementById("messagePopup");
+  p.className = `fixed top-8 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl text-white font-bold shadow-2xl z-[999] transition-all transform border border-white/20 backdrop-blur-md ${type === "error" ? "bg-red-500/90" : "bg-rose-600/90"}`;
+  document.getElementById("popupText").innerText = text;
+  p.classList.remove("hidden");
+  setTimeout(() => p.classList.add("hidden"), 1800);
+}
+
+dateInput.addEventListener("change", renderSlots);
+timeInput.addEventListener("input", renderSlots);
+modeFilter.addEventListener("change", renderSlots);
+
+loadBooking();
+</script>
+{% endblock %}
