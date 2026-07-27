@@ -1,0 +1,20 @@
+services:
+  web:
+    build: .
+    container_name: mental-health-web
+
+    command: python manage.py runserver 0.0.0.0:8000
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/app
+      - mental-health-media:/app/media
+
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+
+volumes:
+  mental-health-media:
